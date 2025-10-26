@@ -1,10 +1,12 @@
-// src/stringCalculator.ts
-export function add(input: string): number {
-    if (input === "") return 0;
+export function add(numbers: string): number {
+    if (!numbers) return 0;
   
-    // Replace newline with comma and split
-    const numbers = input.replace(/\n/g, ",").split(",").map(Number);
+    // Replace newline with comma to handle both separators
+    numbers = numbers.replace(/\n/g, ',');
   
-    return numbers.reduce((sum, num) => sum + num, 0);
+    return numbers
+      .split(',')
+      .map(Number)
+      .reduce((sum, num) => sum + num, 0);
   }
   
