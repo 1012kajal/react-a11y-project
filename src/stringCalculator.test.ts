@@ -16,14 +16,18 @@ describe('String Calculator', () => {
   });
 
   it('should return sum of multiple numbers separated by comma', () => {
-    expect(add("1,2,3,4")).toBe(10);
+    expect(add("1,2,3")).toBe(6);
   });
 
   it('should handle newline as a separator', () => {
     expect(add("1\n2,3")).toBe(6);
   });
 
-  it('should handle custom single-character delimiter', () => {
+  it('should support custom single-character delimiter', () => {
     expect(add("//;\n1;2")).toBe(3);
+  });
+
+  it('should throw error for negative numbers', () => {
+    expect(() => add("1,-2,3,-4")).toThrowError("Negatives not allowed: -2,-4");
   });
 });
