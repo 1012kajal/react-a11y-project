@@ -14,7 +14,7 @@ const App = () => {
     } catch (err: any) {
       setError(err.message);
       setResult(null);
-      alert(err.message); // Alert on error
+      alert(err.message);
     }
   };
 
