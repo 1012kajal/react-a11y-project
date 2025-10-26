@@ -1,37 +1,65 @@
 export function add(input: string): number {
   if (!input) return 0;
 
-  let delimiters = [',', '\n'];
-  let numbers = input;
-
-  // Check for custom delimiters
-  if (input.startsWith('//')) {
-    const delimiterSection = input.split('\n')[0].slice(2);
-
-    // Multiple delimiters using [delim] format
-    const multiDelimMatch = delimiterSection.match(/\[([^\]]+)\]/g);
-    if (multiDelimMatch) {
-      delimiters = multiDelimMatch.map(d => d.slice(1, -1));
-    } else {
-      delimiters = [delimiterSection];
-    }
-
-    numbers = input.split('\n').slice(1).join('\n');
+  // Reject letters or invalid characters
+  if (/[^0-9+\-*/,\n\s//\[\];%*]+/.test(input)) {
+    throw new Error("Invalid characters entered!");
   }
 
-  // Build regex to split based on delimiters
-  const regex = new RegExp(delimiters.map(d => escapeRegExp(d)).join('|'));
-  const nums = numbers.split(regex).map(Number);
+  // Arithmetic operators +, -, *, /
+  const arithmeticRegex = /[-+*/]/;
 
-  // Throw error for negative numbers
-  const negatives = nums.filter(n => n < 0);
-  if (negatives.length) throw new Error(`Negatives not allowed: ${negatives.join(',')}`);
+  // Handle arithmetic if input contains +, -, *, /
+  if (arithmeticRegex.test(input)) {
+    try {
+      const evalResult = eval(input); // simple eval for arithmetic
+      if (evalResult < 0) throw new Error("Negatives not allowed!");
+      if (evalResult > 1000) throw new Error("Numbers greater than 1000 are not allowed!");
+      return evalResult;
+    } catch {
+      throw new Error("Invalid arithmetic expression!");
+    }
+  }
 
-  // Ignore numbers greater than 1000
-  return nums.filter(n => n <= 1000).reduce((a, b) => a + b, 0);
+  // Default delimiters
+  let delimiters = [',', '\n'];
+  let numbersStr = input;
+
+  // Check for custom delimiters
+  const customDelimiterMatch = input.match(/^\/\/(.*?)\n(.*)/s);
+  if (customDelimiterMatch) {
+    const delimiterPart = customDelimiterMatch[1];
+    numbersStr = customDelimiterMatch[2];
+
+    // Multiple delimiters
+    const multiDelimiterMatch = delimiterPart.match(/\[(.+?)\]/g);
+    if (multiDelimiterMatch) {
+      delimiters = multiDelimiterMatch.map(d => d.slice(1, -1));
+    } else {
+      delimiters = [delimiterPart];
+    }
+  }
+
+  // Build regex for splitting
+  const delimiterRegex = new RegExp(delimiters.map(d => escapeRegExp(d)).join('|'), 'g');
+
+  const numbers = numbersStr.split(delimiterRegex).map(n => Number(n));
+
+  // Check negatives
+  const negatives = numbers.filter(n => n < 0);
+  if (negatives.length > 0) {
+    throw new Error(`Negatives not allowed: ${negatives.join(', ')}`);
+  }
+
+  // Check numbers > 1000
+  const bigNumbers = numbers.filter(n => n > 1000);
+  if (bigNumbers.length > 0) {
+    throw new Error(`Numbers greater than 1000 are not allowed: ${bigNumbers.join(', ')}`);
+  }
+
+  return numbers.reduce((acc, curr) => acc + curr, 0);
 }
 
-// Escape special regex characters in delimiters
-function escapeRegExp(str: string) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function escapeRegExp(s: string) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
