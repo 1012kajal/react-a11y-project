@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest'; // ← Add this line
+// stringCalculator.test.ts
+import { describe, it, expect } from 'vitest';
 import { add } from './stringCalculator';
 
 describe('String Calculator', () => {
@@ -8,5 +9,13 @@ describe('String Calculator', () => {
 
   it('should return the number itself for single number input', () => {
     expect(add("5")).toBe(5);
+  });
+
+  it('should return sum of two numbers separated by comma', () => {
+    expect(add("2,3")).toBe(5);
+  });
+
+  it('should return sum of multiple numbers separated by comma', () => {
+    expect(add("1,2,3,4")).toBe(10);
   });
 });
