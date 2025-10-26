@@ -1,7 +1,8 @@
+import { describe, it, expect } from 'vitest';
 import { add } from './stringCalculator';
 
 describe('String Calculator', () => {
-  test('should return 0 for an empty string', () => {
+  it('should return 0 for an empty string', () => {
     expect(add("")).toBe(0);
   });
 });
